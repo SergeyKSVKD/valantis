@@ -1,0 +1,39 @@
+* {
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    user-select: none;
+  }
+  
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  p {
+    padding: 0;
+    margin: 0;
+  }
+  
+  :root {
+    /* Typography */
+    --fs_mini: 14px;
+    --fs_sm: 16px;
+    --fs_md: 24px;
+    --fs_lg: 32px;
+    --fw_light: 400;
+    --fw_normal: 600;
+    --fw_bold: 700;
+    --lh: 24px;
+  
+    /* color palette */
+    --white: rgb(255,255,255);
+    --black: rgb(0,0,0);
+  }
+  
+  
+  
