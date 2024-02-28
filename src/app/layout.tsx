@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Cabin, Lato } from "next/font/google";
+import { Lato } from "next/font/google";
 import "./globals.scss";
 import StoreLayout from "./store/StoreLayout";
 
-const cabin = Cabin({ subsets: ["latin"] });
 const lato = Lato({ subsets: ["latin"], weight: ['400'] });
 
 export const metadata: Metadata = {

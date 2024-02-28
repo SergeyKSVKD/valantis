@@ -1,25 +1,16 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
+import { ProductsReducer } from './ProductSlice'
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 
-export type CounterState = number
-
-const initialState: CounterState = 0
-
-const CounterSlice = createSlice({
-    name: '@counters',
-    initialState, 
-    reducers: {
-
-    }
-})
-
-const CounterReducer =  CounterSlice.reducer
-export default CounterReducer
-
 export const store = configureStore({
     reducer: {
-       counters: CounterReducer,
+        productsList: ProductsReducer,
     },
+    devTools: true,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        trace: true,
+        serializableCheck: false,
+    })
 })

@@ -6,7 +6,9 @@
   body {
     margin: 0;
     padding: 0;
-    user-select: none;
+    background: linear-gradient(to right, #373b44, #4286f4);
+    color: var(--white);
+    // user-select: none;
   }
   
   a {
