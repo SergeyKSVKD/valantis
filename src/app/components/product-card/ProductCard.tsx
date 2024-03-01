@@ -6,6 +6,7 @@ import Braslet from '../../../../public/braslet.webp'
 import Kole from '../../../../public/kole.webp'
 import Kolco from '../../../../public/kolco.webp'
 import Komplekt from '../../../../public/komplekt.webp'
+import Logka from '../../../../public/logka.png'
 import Image from 'next/image'
 import Link from "next/link"
 
@@ -18,7 +19,9 @@ const ProductCard: React.FC<Product> = ({ id, brand, price, product }) => {
     return <Link href={`/catalog/${id}`}><div className={styles.card}>
         <div className={styles.img}>
             <p>Артикул: {id}</p>
-            {product.toLowerCase().includes("серьги") ? <Image src={Seregki} alt='seregki' style={{
+            {product.toLowerCase().includes("серьги") || 
+            product.toLowerCase().includes("пусеты")
+            ? <Image src={Seregki} alt='seregki' style={{
                 width: '150px',
                 height: '150px',
                 padding: '10px',
@@ -30,20 +33,30 @@ const ProductCard: React.FC<Product> = ({ id, brand, price, product }) => {
             }} /> : null}
             {product.toLowerCase().includes("колье") ||
                 product.toLowerCase().includes('кулон') ||
-                product.toLowerCase().includes('брошь')
+                product.toLowerCase().includes('брошь') ||
+                product.toLowerCase().includes('подвес')
                 ? <Image src={Kole} alt='seregki' style={{
                     width: '150px',
                     height: '150px',
                     padding: '10px',
                 }} /> : null}
-            {product.toLowerCase().includes("браслет") ? <Image src={Braslet} alt='seregki' style={{
+            {product.toLowerCase().includes("браслет") ||
+            product.toLowerCase().includes("цепочка") ||
+            product.toLowerCase().includes("цепь")
+            ? <Image src={Braslet} alt='seregki' style={{
                 width: '150px',
                 height: '150px',
                 padding: '10px',
             }} /> : null}
             {product.toLowerCase().includes("комплект") ||
-                product.toLowerCase().includes('антикварная')
+                product.toLowerCase().includes('подстаканник')
                 ? <Image src={Komplekt} alt='seregki' style={{
+                    width: '150px',
+                    height: '150px',
+                    padding: '10px',
+                }} /> : null}
+            {product.toLowerCase().includes("ложка")
+                ? <Image src={Logka} alt='seregki' style={{
                     width: '150px',
                     height: '150px',
                     padding: '10px',

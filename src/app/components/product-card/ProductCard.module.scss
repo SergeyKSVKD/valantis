@@ -2,7 +2,7 @@
     display: grid;
     gap: 10px;
     width: 250px;
-    height: 250px;
+    height: 280px;
     padding: 0px 15px;
     text-align: left;
         &:hover {
@@ -19,6 +19,9 @@
     background: rgba(185, 185, 185, 0.5);
     filter: drop-shadow(-5px 22px 26px rgba(95, 95, 95, 0.25));
     padding: 10px;
+    overflow: hidden;
+    width: 220px;
+    height: 200px;
         p {
             font-size: 10px;
         }

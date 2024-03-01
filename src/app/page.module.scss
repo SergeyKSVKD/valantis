@@ -1,6 +1,7 @@
 .main {
     position: relative;
     display: grid;
+    grid-template-rows: 160px 100px 1fr 68px;
     height: 100vh;
     justify-content: center;
     text-align: center;

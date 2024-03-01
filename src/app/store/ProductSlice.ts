@@ -23,51 +23,62 @@ const initialState: ProductsI = {
     error: '',
 }
 
-type Params = {
-    "offset"?: number,
-    "limit"?: number,
-    "price"?: number,
-    "ids"?: string[]
+export type Params = {
+    offset: number,
+    limit: number,
+    price?: number,
+    ids?: string[]
+    product?: string,
+    brand?: string,
 }
 
-type ActionProp = {
-    "action": 'get_items' | 'get_ids' | 'filter' | 'get_fields',
-    "params"?: string | Params,
+export type ActionProp = {
+    action: 'get_items' | 'get_ids' | 'filter' | 'get_fields',
+    params: Params,
 }
 
 export const loadProducts = createAsyncThunk(
     '@products/get-all',
 
-    async ({ action = 'get_ids', params = '' }: ActionProp, { dispatch }) => {
-        const validParams: ActionProp = {
-            "action": action,
+    async ({ action = 'get_ids', params }: ActionProp, { dispatch }) => {
+
+        const body: any = {}
+        body["action"] = action
+        const query: any = {}
+        if (params.brand) {
+            query["brand"] = params.brand
         }
-        if (typeof params !== 'string') {
-            validParams.params = params
+        if (params.price) {
+            query["price"] = params.price
         }
+        if (params.product) {
+            query["product"] = params.product
+        }
+        body["params"] = { ...query }
+
         const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, "")
         const key = md5(`Valantis_${timestamp}`).toString()
         const ids = await fetch(`http://api.valantis.store:40000/`, {
             method: "POST",
-            body: JSON.stringify({
-                "action": "get_ids",
-                "params": validParams.params
-            }),
+            body: JSON.stringify(body),
             headers: {
                 "Content-type": "application/json",
                 "X-Auth": key
             },
         })
         const idsList = await ids.json()
+        const limit = params?.limit
+        const offset = params?.offset
+        const formattedIDS: any[] = Array.from(new Set(idsList.result)).slice(offset, offset + limit)
+
         if (idsList === undefined) {
             throw new Error(`Неверный запрос! Ошибка сервера`)
         }
-
         const res = await fetch(`http://api.valantis.store:40000/`, {
             method: "POST",
             body: JSON.stringify({
-                "action": validParams.action,
-                "params": { "ids": [...idsList.result] },
+                "action": "get_items",
+                "params": { "ids": [...formattedIDS] },
             }),
             headers: {
                 "Content-type": "application/json",
@@ -90,13 +101,16 @@ export const loadProducts = createAsyncThunk(
             throw new Error(`Неверный запрос! Ошибка сервера`)
         }
     }
+
 )
 
 const productsSlice = createSlice({
     name: '@products',
     initialState,
     reducers: {
-
+        removeProducts: (state) => {
+            state.products = initialState.products
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -118,4 +132,5 @@ const productsSlice = createSlice({
     }
 })
 
+export const { removeProducts } = productsSlice.actions
 export const ProductsReducer = productsSlice.reducer
