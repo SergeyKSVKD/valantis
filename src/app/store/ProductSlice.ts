@@ -43,43 +43,17 @@ export const loadProducts = createAsyncThunk(
     async ({ action = 'get_ids', params }: ActionProp, { dispatch }) => {
 
         const body: any = {}
-        body["action"] = action
+        body["action"] = "get_items"
         const query: any = {}
-        if (params.brand) {
-            query["brand"] = params.brand
-        }
-        if (params.price) {
-            query["price"] = params.price
-        }
-        if (params.product) {
-            query["product"] = params.product
+        if (params.ids) {
+            query["ids"] = params.ids
         }
         body["params"] = { ...query }
-
         const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, "")
         const key = md5(`Valantis_${timestamp}`).toString()
-        const ids = await fetch(`http://api.valantis.store:40000/`, {
-            method: "POST",
-            body: JSON.stringify(body),
-            headers: {
-                "Content-type": "application/json",
-                "X-Auth": key
-            },
-        })
-        const idsList = await ids.json()
-        const limit = params?.limit
-        const offset = params?.offset
-
-        if (idsList === undefined) {
-            throw new Error(`Неверный запрос! Ошибка сервера`)
-        }
-        const formattedIDS: any[] = Array.from(new Set(idsList.result)).slice(offset, offset + limit)
         const res = await fetch(`http://api.valantis.store:40000/`, {
             method: "POST",
-            body: JSON.stringify({
-                "action": "get_items",
-                "params": { "ids": [...formattedIDS] },
-            }),
+            body: JSON.stringify(body),
             headers: {
                 "Content-type": "application/json",
                 "X-Auth": key

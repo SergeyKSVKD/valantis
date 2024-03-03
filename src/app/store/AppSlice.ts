@@ -9,6 +9,7 @@ type ErrorProp = string
 interface AppI {
     activePage: number,
     pageCount: number,
+    ids: any,
     action: 'get_ids' | 'filter' | 'get_fields',
     params: Params,
     loading: LoadingProp,
@@ -21,6 +22,7 @@ const initialState: AppI = {
     error: '',
     pageCount: 1,
     activePage: 1,
+    ids: [],
     action: 'get_ids',
     params: {
         "limit": 50,
@@ -41,9 +43,17 @@ export const getIDS = createAsyncThunk(
         const key = md5(`Valantis_${timestamp}`).toString()
         const body: any = {}
         body["action"] = action
-        if (params !== undefined) {
-            body["params"] = params
+        const query: any = {}
+        if (params.brand) {
+            query["brand"] = params.brand
         }
+        if (params.price) {
+            query["price"] = params.price
+        }
+        if (params.product) {
+            query["product"] = params.product
+        }
+        body["params"] = { ...query }
 
         const ids = await fetch(`http://api.valantis.store:40000/`, {
             method: "POST",
@@ -54,11 +64,26 @@ export const getIDS = createAsyncThunk(
             },
         })
         const idsList = await ids.json()
-        
+
+        if (idsList.result.length === 0) {
+            return {
+                ids: [],
+                pageCount: 0,
+                notification: 'К сожалению, в нашем каталоге нет товаров, подходящих под выбранные фильтры. Попробуйте поменять или очистить очистить фильтры, и товары обязательно найдутся.'
+            }
+        }
+
         if (idsList !== undefined) {
             const formattedIDS = new Set(idsList.result)
+            const limit = params?.limit
+            const offset = params?.offset
+            const idsResult = {
+                ids: Array.from(formattedIDS).slice(offset, offset + limit),
+                pageCount: formattedIDS.size,
+                notification: ''
+            }
 
-            return formattedIDS.size
+            return idsResult
         }
         else {
             throw new Error(`Неверный запрос! Ошибка сервера`)
@@ -79,7 +104,7 @@ export const getAllBrands = createAsyncThunk(
             method: "POST",
             body: JSON.stringify({
                 "action": "get_fields",
-                "params": {"field": "brand"}
+                "params": { "field": "brand" }
             }
             ),
             headers: {
@@ -91,7 +116,7 @@ export const getAllBrands = createAsyncThunk(
         const formattedBrands = new Set(brandsList.result)
         formattedBrands.delete(null)
         const brands: any = Array.from(formattedBrands)
-        
+
         if (brands.length !== 0) {
             return brands
         }
@@ -116,25 +141,37 @@ const AppSlice = createSlice({
         clearFilters: (state) => {
             state.params = initialState.params
             state.action = "get_ids"
+            state.ids = []
+            state.activePage = 1
+        },
+        clearIDS: (state) => {
+            state.ids = []
+            state.error = ''
         },
         addFilter: (state, action: PayloadAction<AppI['params']>) => {
-            state.params = action.payload
+            console.log(action.payload);
+            if (action.payload.brand !== '' || action.payload.product !== '' || action.payload.price !== 0) {
+                state.params = action.payload
+            }
         },
     },
     extraReducers: (builder) => {
         builder
             .addCase(getIDS.pending, (state) => {
                 state.loading = 'loading'
+                state.error = ''
             })
             .addCase(getIDS.fulfilled, (state, action) => {
-                state.pageCount = Math.ceil(action.payload / 50)
+                state.pageCount = Math.ceil(action.payload.pageCount / 50)
+                state.ids = action.payload.ids
                 state.loading = 'idle'
-                state.error = ''
+                state.error = action.payload.notification ? action.payload.notification : ''
             })
             .addCase(getIDS.rejected, (state, action) => {
                 state.loading = 'idle'
                 if (action.error.message) {
                     console.log(action.error);
+                    state.ids = []
                     state.error = action.error.message ? action.error.message : '« Сервис временно недоступен! »'
                 }
             })
@@ -147,4 +184,4 @@ const AppSlice = createSlice({
 })
 
 export const AppReducer = AppSlice.reducer
-export const { changeActivePage, changeAction, clearFilters, addFilter } = AppSlice.actions
+export const { changeActivePage, changeAction, clearFilters, addFilter, clearIDS } = AppSlice.actions

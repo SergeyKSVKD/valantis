@@ -1,17 +1,18 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import styles from './Filter.module.scss'
 import { useDebounce } from '@/app/helpers/useDebounce'
-import { addFilter, changeAction, changeActivePage, clearFilters, getAllBrands } from '@/app/store/AppSlice'
+import { addFilter, changeAction, changeActivePage, clearFilters, clearIDS, getAllBrands } from '@/app/store/AppSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/app/store/store'
 import Menu from '../../../../public/menu.svg'
 import cn from 'classnames'
 import { motion } from 'framer-motion'
 import { IoClose } from "react-icons/io5";
-import { loadProducts, removeProducts } from '@/app/store/ProductSlice'
+import { removeProducts } from '@/app/store/ProductSlice'
 
 const Filter = () => {
     const dispatch = useDispatch<AppDispatch>()
+    const productsList = useSelector((state: RootState) => state.productsList)
     const brands = useSelector((state: RootState) => state.application.brands)
     const action = useSelector((state: RootState) => state.application.action)
     const ActiveBrand = useSelector((state: RootState) => state.application.params.brand)
@@ -27,7 +28,11 @@ const Filter = () => {
 
     useEffect(() => {
         if (search.product) {
-            dispatch(removeProducts())
+            if (productsList.products.length !== 0) {
+                dispatch(removeProducts())
+            }
+            dispatch(changeActivePage(1))
+            dispatch(clearIDS())
             dispatch(changeAction('filter'))
             dispatch(addFilter({
                 "limit": 50,
@@ -39,7 +44,11 @@ const Filter = () => {
             setVisibleFilters(false)
         }
         if (search.price) {
-            dispatch(removeProducts())
+            if (productsList.products.length !== 0) {
+                dispatch(removeProducts())
+            }
+            dispatch(changeActivePage(1))
+            dispatch(clearIDS())
             dispatch(changeAction('filter'))
             dispatch(addFilter({
                 "limit": 50,
@@ -50,22 +59,14 @@ const Filter = () => {
             }))
             setVisibleFilters(false)
         }
-        else {
-            dispatch(removeProducts())
-            dispatch(loadProducts({
-                action: 'get_ids',
-                params: {
-                    limit: 50,
-                    offset: 0,
-                }
-            }))
-        }
 
     }, [debounceSearchProduct, debounceSearchPrice])
 
     useEffect(() => {
-        dispatch(getAllBrands())
-    }, [])
+        if (brands.length === 0) {
+            dispatch(getAllBrands())
+        }
+    }, [brands])
 
     return (<div>
         <div className={styles.filters_btn} onClick={() => setVisibleFilters(!visibleFilters)}>
@@ -107,7 +108,8 @@ const Filter = () => {
                                 cn({ [styles.active]: ActiveBrand === item })
                             }
                                 onClick={() => {
-                                    dispatch(clearFilters())
+                                    dispatch(changeActivePage(1))
+                                    dispatch(clearIDS())
                                     dispatch(changeAction('filter'))
                                     dispatch(addFilter({
                                         "limit": 50,
@@ -134,7 +136,7 @@ const Filter = () => {
                         placeholder="Название продукта"
                         value={search.product}
                         onChange={(e) => setSearch({
-                            ...search,
+                            price: '0',
                             product: e.target.value
                         })} />
                 </div>
@@ -146,19 +148,20 @@ const Filter = () => {
                         placeholder="Цена"
                         value={search.price}
                         onChange={(e) => setSearch({
-                            ...search,
+                            product: '',
                             price: e.target.value
                         })} />
                 </div>
 
                 <div onClick={() => {
-                    dispatch(clearFilters())
-                    setVisibleFilters(false)
-                    setSearch({
-                        product: '',
-                        price: "",
-                    })
-                    dispatch(changeActivePage(1))
+                    if (action === 'filter') {
+                        dispatch(clearFilters())
+                        setVisibleFilters(false)
+                        setSearch({
+                            product: '',
+                            price: "",
+                        })
+                    }
                 }}
                     className={styles.clear_btn}
                 >
