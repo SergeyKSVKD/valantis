@@ -69,11 +69,11 @@ export const loadProducts = createAsyncThunk(
         const idsList = await ids.json()
         const limit = params?.limit
         const offset = params?.offset
-        const formattedIDS: any[] = Array.from(new Set(idsList.result)).slice(offset, offset + limit)
 
         if (idsList === undefined) {
             throw new Error(`Неверный запрос! Ошибка сервера`)
         }
+        const formattedIDS: any[] = Array.from(new Set(idsList.result)).slice(offset, offset + limit)
         const res = await fetch(`http://api.valantis.store:40000/`, {
             method: "POST",
             body: JSON.stringify({
@@ -86,6 +86,7 @@ export const loadProducts = createAsyncThunk(
             },
         })
         const data = await res.json()
+        
         if (data !== undefined) {
             const formattedResult: Product[] = []
             data.result.filter((item: Product) => {
@@ -110,12 +111,15 @@ const productsSlice = createSlice({
     reducers: {
         removeProducts: (state) => {
             state.products = initialState.products
+            state.loading = initialState.loading
+            state.error = initialState.error
         }
     },
     extraReducers: (builder) => {
         builder
             .addCase(loadProducts.pending, (state) => {
                 state.loading = 'loading'
+                state.error = ''
             })
             .addCase(loadProducts.fulfilled, (state, action) => {
                 state.products = action.payload
@@ -125,7 +129,6 @@ const productsSlice = createSlice({
             .addCase(loadProducts.rejected, (state, action) => {
                 state.loading = 'idle'
                 if (action.error.message) {
-                    console.log(action.error);
                     state.error = action.error.message ? action.error.message : '« Сервис временно недоступен! »'
                 }
             })
