@@ -149,7 +149,6 @@ const AppSlice = createSlice({
             state.error = ''
         },
         addFilter: (state, action: PayloadAction<AppI['params']>) => {
-            console.log(action.payload);
             if (action.payload.brand !== '' || action.payload.product !== '' || action.payload.price !== 0) {
                 state.params = action.payload
             }

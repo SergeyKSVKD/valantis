@@ -6,8 +6,8 @@ import StoreLayout from "./store/StoreLayout";
 const lato = Lato({ subsets: ["latin"], weight: ['400'] });
 
 export const metadata: Metadata = {
-  title: "Next App",
-  description: "Next App",
+  title: "Valantis",
+  description: "Valantis",
 };
 
 export default function RootLayout({

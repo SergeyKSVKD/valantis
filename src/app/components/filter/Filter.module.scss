@@ -6,6 +6,9 @@
     gap: 10px;
     font-size: 20px;
     font-weight: 700;
+        &:hover {
+            cursor: pointer;
+        }
 }
 
 .dots {
@@ -55,7 +58,7 @@
 
 .brands {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 10px;
         p {
             transition: 0.2s ease-in-out;
@@ -107,7 +110,7 @@
 .clear_btn {
     border: 2px solid var(--white);
     width: max-content;
-    margin: 50px 0 20px;
+    margin: 20px 0;
     padding: 5px 10px;
     border-radius: 4px;
         &:hover {
@@ -119,6 +122,33 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
+    z-index: 3;
+    color: var(--white);
+    font-size: 1.5rem;
+        &:hover {
+            cursor: pointer;
+        }
+}
+
+.search_btn {
+    border: 2px solid var(--white);
+    width: 300px;
+    margin: 20px 0;
+    padding: 5px 10px;
+    border-radius: 4px;
+        &:hover {
+            cursor: pointer;
+        }
+}
+
+.filter_container {
+    position: relative;
+}
+
+.delete {
+    position: absolute;
+    top: 48px;
+    left: 270px;
     z-index: 3;
     color: var(--white);
     font-size: 1.5rem;

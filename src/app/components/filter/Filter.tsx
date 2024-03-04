@@ -21,46 +21,57 @@ const Filter = () => {
         price: "",
     })
     const [visibleFilters, setVisibleFilters] = useState(false)
-    const debounceSearchProduct = useDebounce(search.product, 3000)
-    const debounceSearchPrice = useDebounce(search.price, 3000)
+    // const debounceSearchProduct = useDebounce(search.product, 3000)
+    // const debounceSearchPrice = useDebounce(search.price, 3000)
     const searchRef = useRef<HTMLInputElement>(null)
     const priceRef = useRef<HTMLInputElement>(null)
 
-    useEffect(() => {
-        if (search.product) {
-            if (productsList.products.length !== 0) {
-                dispatch(removeProducts())
-            }
-            dispatch(changeActivePage(1))
-            dispatch(clearIDS())
-            dispatch(changeAction('filter'))
-            dispatch(addFilter({
-                "limit": 50,
-                "offset": 0,
-                "price": 0,
-                "product": search.product,
-                "brand": '',
-            }))
-            setVisibleFilters(false)
-        }
-        if (search.price) {
-            if (productsList.products.length !== 0) {
-                dispatch(removeProducts())
-            }
-            dispatch(changeActivePage(1))
-            dispatch(clearIDS())
-            dispatch(changeAction('filter'))
-            dispatch(addFilter({
-                "limit": 50,
-                "offset": 0,
-                "price": Number(search.price),
-                "product": '',
-                "brand": '',
-            }))
-            setVisibleFilters(false)
-        }
+    function validateForm() {
+        var price = priceRef.current?.value;
 
-    }, [debounceSearchProduct, debounceSearchPrice])
+        if (price && !/^[0-9]+$/.test(price)) {
+            return false
+        }
+        else {
+            return true
+        }
+    }
+
+    // useEffect(() => {
+    //     if (search.product) {
+    //         if (productsList.products.length !== 0) {
+    //             dispatch(removeProducts())
+    //         }
+    //         dispatch(changeActivePage(1))
+    //         dispatch(clearIDS())
+    //         dispatch(changeAction('filter'))
+    //         dispatch(addFilter({
+    //             "limit": 50,
+    //             "offset": 0,
+    //             "price": 0,
+    //             "product": search.product,
+    //             "brand": '',
+    //         }))
+    //         setVisibleFilters(false)
+    //     }
+    //     if (search.price) {
+    //         if (productsList.products.length !== 0) {
+    //             dispatch(removeProducts())
+    //         }
+    //         dispatch(changeActivePage(1))
+    //         dispatch(clearIDS())
+    //         dispatch(changeAction('filter'))
+    //         dispatch(addFilter({
+    //             "limit": 50,
+    //             "offset": 0,
+    //             "price": Number(search.price),
+    //             "product": '',
+    //             "brand": '',
+    //         }))
+    //         setVisibleFilters(false)
+    //     }
+
+    // }, [debounceSearchProduct, debounceSearchPrice])
 
     useEffect(() => {
         if (brands.length === 0) {
@@ -129,8 +140,17 @@ const Filter = () => {
                     </div>
                 </div>
 
-                <div>
+                <div className={styles.filter_container}>
                     <p className={styles.filter}>Название продукта</p>
+                    <IoClose className={styles.delete} onClick={() => {
+                        if (action === 'filter') {
+                            dispatch(clearFilters())
+                            setSearch({
+                                product: '',
+                                price: "0",
+                            })
+                        }
+                    }} />
                     <input ref={searchRef}
                         className={styles.search}
                         placeholder="Название продукта"
@@ -139,18 +159,96 @@ const Filter = () => {
                             price: '0',
                             product: e.target.value
                         })} />
+                    <div className={styles.search_btn}
+                        onClick={() => {
+                            if (productsList.products.length !== 0) {
+                                dispatch(removeProducts())
+                            }
+                            dispatch(clearFilters())
+                            dispatch(changeAction('filter'))
+                            dispatch(addFilter({
+                                "limit": 50,
+                                "offset": 0,
+                                "price": 0,
+                                "product": searchRef.current?.value,
+                                "brand": '',
+                            }))
+                            setVisibleFilters(false)
+                        }}
+                    >Искать по названию</div>
                 </div>
 
-                <div>
+                <div className={styles.filter_container}>
                     <p className={styles.filter}>Цена</p>
+                    <IoClose className={styles.delete} onClick={() => {
+                        if (action === 'filter') {
+                            dispatch(clearFilters())
+                            setSearch({
+                                product: '',
+                                price: "0",
+                            })
+                        }
+                    }} />
                     <input ref={priceRef}
                         className={styles.search}
                         placeholder="Цена"
                         value={search.price}
-                        onChange={(e) => setSearch({
-                            product: '',
-                            price: e.target.value
-                        })} />
+                        onFocus={(e) => {
+                            if (search.price.length > 0) {
+                                setSearch({
+                                    product: '',
+                                    price: search.price,
+                                })
+                            }
+                            if (search.price === '0') {
+                                setSearch({
+                                    product: '',
+                                    price: '',
+                                })
+                            }
+                        }}
+                        onBlur={(e) => {
+                            if (search.price === '') {
+                                setSearch({
+                                    product: '',
+                                    price: '0'
+                                })
+                            }
+                            else {
+                                if (search.price.startsWith('0')) {
+                                    const string = parseInt(search.price, 10).toString()
+                                    setSearch({
+                                        product: '',
+                                        price: string
+                                    })
+                                }
+                            }
+                        }}
+                        onChange={(e) => {
+                            if (validateForm()) {
+                                setSearch({
+                                    product: '',
+                                    price: e.target.value,
+                                })
+                            }
+                        }} />
+                    <div className={styles.search_btn}
+                        onClick={() => {
+                            if (productsList.products.length !== 0) {
+                                dispatch(removeProducts())
+                            }
+                            dispatch(clearFilters())
+                            dispatch(changeAction('filter'))
+                            dispatch(addFilter({
+                                "limit": 50,
+                                "offset": 0,
+                                "price": Number(priceRef.current?.value),
+                                "product": '',
+                                "brand": '',
+                            }))
+                            setVisibleFilters(false)
+                        }}
+                    >Искать по цене</div>
                 </div>
 
                 <div onClick={() => {
@@ -159,7 +257,7 @@ const Filter = () => {
                         setVisibleFilters(false)
                         setSearch({
                             product: '',
-                            price: "",
+                            price: "0",
                         })
                     }
                 }}

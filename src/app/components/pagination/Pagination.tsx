@@ -63,7 +63,7 @@ const Pagination = ({ pageCount = 1, siblingCount = 1, }) => {
             }
             getData()
         }
-    }, [action, activePage, params.brand, params.price, params.product])
+    }, [action, activePage, params.brand, params.price, params.product, application.error])
 
     let pag = []
     const PageBtn = ({ page }: { page: number }) => {

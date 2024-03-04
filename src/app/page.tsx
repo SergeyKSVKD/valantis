@@ -17,7 +17,6 @@ export default function Home() {
   const application = useSelector((state: RootState) => state.application)
   const pageCount = useSelector((state: RootState) => state.application.pageCount)
   const action = useSelector((state: RootState) => state.application.action)
-  const params = useSelector((state: RootState) => state.application.params)
 
   useEffect(() => {
     const getData = () => {
